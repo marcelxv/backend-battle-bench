@@ -55,9 +55,12 @@ export default function Home() {
   const TS_API_URL = process.env.NEXT_PUBLIC_TS_API_URL;
   const RUST_API_URL = process.env.NEXT_PUBLIC_RUST_API_URL;
 
-  if (!TS_API_URL || !RUST_API_URL) {
-    throw new Error('API URLs not configured. Please set NEXT_PUBLIC_TS_API_URL and NEXT_PUBLIC_RUST_API_URL environment variables.');
-  }
+  // Check for API URLs and set error state instead of throwing
+  useEffect(() => {
+    if (!TS_API_URL || !RUST_API_URL) {
+      setError('API URLs not configured. Please set NEXT_PUBLIC_TS_API_URL and NEXT_PUBLIC_RUST_API_URL environment variables.');
+    }
+  }, [TS_API_URL, RUST_API_URL]);
 
   useEffect(() => {
     if (tsResult && rustResult) {
@@ -117,6 +120,10 @@ export default function Home() {
   };
 
   const handleBenchmarkTS = async () => {
+    if (!TS_API_URL) {
+      setError('TypeScript API URL not configured');
+      return;
+    }
     setLoading(true);
     setWinner(null);
     setError(null);
@@ -132,6 +139,10 @@ export default function Home() {
   };
 
   const handleBenchmarkRust = async () => {
+    if (!RUST_API_URL) {
+      setError('Rust API URL not configured');
+      return;
+    }
     setLoading(true);
     setWinner(null);
     setError(null);
@@ -147,6 +158,10 @@ export default function Home() {
   };
 
   const handleBothBenchmarks = async () => {
+    if (!TS_API_URL || !RUST_API_URL) {
+      setError('API URLs not configured');
+      return;
+    }
     setLoading(true);
     setWinner(null);
     setError(null);
@@ -169,6 +184,11 @@ export default function Home() {
   const handleThroughputTest = async () => {
     if (!documentText) {
       setThroughputError('Please enter a document text');
+      return;
+    }
+    
+    if (!TS_API_URL || !RUST_API_URL) {
+      setThroughputError('API URLs not configured');
       return;
     }
     
